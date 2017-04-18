@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.telephony.SmsManager;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -53,11 +55,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                showDialogConfirm(position);
+//                Intent itent = new Intent(MainActivity.this, MainActivityA.class);
+//                startActivity(itent);
             }
         });
     }
-
-
 
 
     private void checkAndRequestPermissions() {
@@ -107,12 +109,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void showDialogConfirm(final int position){
+    public void showDialogConfirm(final int position) {
         Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.custom_dialog_layout);
         Button btnCall = (Button) dialog.findViewById(R.id.btn_call);
         Button btnSendMessage = (Button) dialog.findViewById(R.id.btn_send_message);
-        
+
         btnCall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -130,15 +132,29 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void intentSendMesseage(int position) {
-        Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse("sms:"+arrayContact.get(position).getmNumber()));
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + arrayContact.get(position).getmNumber()));
         startActivity(intent);
     }
 
     private void intentCall(int position) {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_CALL);
-        intent.setData(Uri.parse("tel:"+arrayContact.get(position).getmNumber()));
+        intent.setData(Uri.parse("tel:" + arrayContact.get(position).getmNumber()));
         startActivity(intent);
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        if (!isTaskRoot()) {
+            Intent intent = getIntent();
+            String action = intent.getAction();
+            if (intent.hasCategory(Intent.CATEGORY_LAUNCHER) && action != null && action.equals(Intent.ACTION_MAIN)) {
+                finish();
+                return;
+            }
+        }
+    }
 }
+
+
